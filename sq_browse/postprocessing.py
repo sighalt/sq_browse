@@ -1,5 +1,6 @@
 import abc
 from collections import deque
+from logging import warning
 from urllib.parse import urljoin
 from xml.etree.ElementTree import Element
 
@@ -7,6 +8,7 @@ from lxml import html
 from typing import Dict, List, Type
 
 from sq_browse import html_utils
+from sq_browse.errors import UnprocessableError
 from sq_browse.html_utils import get_text
 from sq_browse.structs import BrowserResponse
 
@@ -53,7 +55,9 @@ class TextProcessor(BaseProcessor):
         data = super().process(data)
         tree: html.HtmlElement = data["_tree"]
         body = tree.find("body")
+
         main = body.find("main")
+
         main_text = html_utils.get_text(main if main is not None else body)
         main_text = "\n".join([line.strip() for line in main_text.splitlines()])
         data["content"]["text"] = main_text
@@ -202,7 +206,7 @@ class Pipeline(object):
         self.components[name] = component
         self.dependencies[name] = component.dependencies
 
-    def run(self, response: BrowserResponse) -> Dict:
+    def run(self, response: BrowserResponse, fail_save=True) -> Dict:
         data = {
             "meta": {
                 "elapsed": response.elapsed.total_seconds(),
@@ -220,7 +224,13 @@ class Pipeline(object):
         }
 
         for component in self.iter_components():
-            data = component.process(data)
+            try:
+                data = component.process(data)
+            except Exception as e:
+                if fail_save:
+                    warning(f"Could not process data with {component.__class__.__name__}")
+                else:
+                    raise UnprocessableError(str(e))
 
         self._clean_data(data)
 
