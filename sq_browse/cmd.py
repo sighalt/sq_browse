@@ -31,6 +31,25 @@ def cmd_run(args):
         sys.exit(1)
 
 
+def cmd_run_subprocess(args):
+    browser = registry.get_browser(args.browser)
+
+    while True:
+        try:
+            url = sys.stdin.readline().strip()
+            response = browser.browse(ambiguous_url=url)
+            data = pipeline.run(response)
+            json.dump(data, sys.stdout, default=json_decode_fallback)
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+        except KeyboardInterrupt:
+            return
+        except BrokenPipeError:
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+            sys.exit(1)
+
+
 def cmd_config(args):
     print("Browsers:")
     for name, browser_cls in registry.browsers.items():
@@ -55,6 +74,10 @@ def main(*argv):
     run_parser.set_defaults(func=cmd_run)
     run_parser.add_argument("url")
     run_parser.add_argument("--browser", "-b", default="requests")
+
+    run_subproc_parser = sub_parsers.add_parser("run-subprocess")
+    run_subproc_parser.set_defaults(func=cmd_run_subprocess)
+    run_subproc_parser.add_argument("--browser", "-b", default="requests")
 
     config_parser = sub_parsers.add_parser("config")
     config_parser.set_defaults(func=cmd_config)
