@@ -25,7 +25,7 @@ def main(*argv):
     args = arg_parser.parse_args(argv or sys.argv[1:])
     browser = registry.get_browser(args.browser)
 
-    response = browser.browse(url=args.url)
+    response = browser.browse(ambiguous_url=args.url)
     data = pipeline.run(response)
 
     # del data["raw"]["content"]
