@@ -1,0 +1,22 @@
+[project]
+name = "sq_browse"
+version = "0.0.1"
+authors = [
+  { name="Jakob Rößler", email="jakob@roessler.dev" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+sq_browse = "sq_browse.cmd:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["sq_browse"]
