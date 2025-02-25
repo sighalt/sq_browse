@@ -65,8 +65,6 @@ def cmd_config(args):
 
 def main(*argv):
     """Commandline entry point for sq_browse."""
-    load_all_plugins()
-
     arg_parser = argparse.ArgumentParser()
     sub_parsers = arg_parser.add_subparsers(title="command", required=True)
 
@@ -83,6 +81,8 @@ def main(*argv):
     config_parser.set_defaults(func=cmd_config)
 
     args = arg_parser.parse_args(argv or sys.argv[1:])
+    load_all_plugins()
+
     args.func(args)
 
 
