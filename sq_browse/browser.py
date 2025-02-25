@@ -29,13 +29,17 @@ class Browser(object):
 
 
 class RequestsBrowser(Browser):
+    HEADERS = {
+        "user-agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/132.0.0.0 Safari/537.36")
+    }
 
     def browse(self, ambiguous_url: str) -> BrowserResponse:
         start = datetime.now()
 
         for url in self.possible_urls(ambiguous_url):
             with suppress(IOError):
-                r = requests.get(url, timeout=2000)
+                r = requests.get(url, timeout=2000, headers=self.HEADERS)
                 break
         else:
             raise IOError(f"No valid URL found for {ambiguous_url}")
