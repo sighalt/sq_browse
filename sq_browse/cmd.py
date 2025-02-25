@@ -48,6 +48,9 @@ def cmd_run_subprocess(args):
             devnull = os.open(os.devnull, os.O_WRONLY)
             os.dup2(devnull, sys.stdout.fileno())
             sys.exit(1)
+        except Exception:
+            print("")
+            continue
 
 
 def cmd_config(args):
