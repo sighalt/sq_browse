@@ -38,7 +38,7 @@ def cmd_run_subprocess(args):
         try:
             url = sys.stdin.readline().strip()
             response = browser.browse(ambiguous_url=url)
-            data = pipeline.run(response)
+            data = pipeline.run(response, fail_save=False)
             json.dump(data, sys.stdout, default=json_decode_fallback)
             sys.stdout.write("\n")
             sys.stdout.flush()
@@ -48,8 +48,9 @@ def cmd_run_subprocess(args):
             devnull = os.open(os.devnull, os.O_WRONLY)
             os.dup2(devnull, sys.stdout.fileno())
             sys.exit(1)
-        except Exception:
-            print("")
+        except Exception as e:
+            sys.stderr.write(str(e) + "\n")
+            sys.stderr.flush()
             continue
 
 
