@@ -16,22 +16,12 @@ def json_decode_fallback(obj):
     raise JSONDecodeError
 
 
-def main(*argv):
-    """Commandline entry point for sq_browse."""
-    load_all_plugins()
-
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("url")
-    arg_parser.add_argument("--browser", "-b", default="requests")
-
-    args = arg_parser.parse_args(argv or sys.argv[1:])
-
+def cmd_run(args):
     browser = registry.get_browser(args.browser)
 
     response = browser.browse(ambiguous_url=args.url)
     data = pipeline.run(response)
 
-    # del data["raw"]["content"]
     try:
         json.dump(data, sys.stdout, default=json_decode_fallback)
         sys.stdout.flush()
@@ -39,6 +29,38 @@ def main(*argv):
         devnull = os.open(os.devnull, os.O_WRONLY)
         os.dup2(devnull, sys.stdout.fileno())
         sys.exit(1)
+
+
+def cmd_config(args):
+    print("Browsers:")
+    for name, browser_cls in registry.browsers.items():
+        print(f"- {name:15s}\t{browser_cls.__module__}.{browser_cls.__name__}")
+
+    print("")
+
+    print("Processors:")
+    for processor_name in pipeline.sorted_components():
+        processor = pipeline.components[processor_name]
+        print(f"- {processor_name:15s}\t{processor.__module__}.{processor.__class__.__name__}")
+
+
+def main(*argv):
+    """Commandline entry point for sq_browse."""
+    load_all_plugins()
+
+    arg_parser = argparse.ArgumentParser()
+    sub_parsers = arg_parser.add_subparsers(title="command", required=True)
+
+    run_parser = sub_parsers.add_parser("run")
+    run_parser.set_defaults(func=cmd_run)
+    run_parser.add_argument("url")
+    run_parser.add_argument("--browser", "-b", default="requests")
+
+    config_parser = sub_parsers.add_parser("config")
+    config_parser.set_defaults(func=cmd_config)
+
+    args = arg_parser.parse_args(argv or sys.argv[1:])
+    args.func(args)
 
 
 if __name__ == '__main__':
