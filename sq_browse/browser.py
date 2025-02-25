@@ -74,3 +74,4 @@ class BrowserRegistry(object):
 
 
 registry = BrowserRegistry()
+registry.register("requests", RequestsBrowser, {})

@@ -14,8 +14,6 @@ classifiers = [
 [project.scripts]
 sq_browse = "sq_browse.cmd:main"
 
-[project.entry-points.'sq_browse.browser']
-requests = "sq_browse.browser:RequestsBrowser"
 
 [build-system]
 requires = ["setuptools>=61.0"]

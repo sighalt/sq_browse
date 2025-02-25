@@ -6,7 +6,7 @@ from datetime import datetime
 from json import JSONDecodeError
 
 from sq_browse.browser import registry
-from sq_browse.plugins import load_browser_plugins
+from sq_browse.plugins import load_all_plugins
 from sq_browse.postprocessing import pipeline
 
 
@@ -18,7 +18,7 @@ def json_decode_fallback(obj):
 
 def main(*argv):
     """Commandline entry point for sq_browse."""
-    load_browser_plugins()
+    load_all_plugins()
 
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("url")
