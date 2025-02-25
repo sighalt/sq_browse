@@ -243,6 +243,8 @@ class Pipeline(object):
             if key.startswith("_"):
                 del data[key]
 
+        del data["raw"]["content"]
+
     def iter_components(self):
         """Iterate over all components in the correct order, such that all dependencies are met."""
         for component_name in self.sorted_components():
