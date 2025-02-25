@@ -5,7 +5,7 @@ authors = [
   { name="Jakob Rößler", email="jakob@roessler.dev" },
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
@@ -14,9 +14,13 @@ classifiers = [
 [project.scripts]
 sq_browse = "sq_browse.cmd:main"
 
+[project.entry-points.'sq_browse.browser']
+requests = "sq_browse.browser:RequestsBrowser"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["sq_browse"]
+
