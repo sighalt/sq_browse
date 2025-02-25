@@ -228,7 +228,7 @@ class Pipeline(object):
                 data = component.process(data)
             except Exception as e:
                 if fail_save:
-                    warning(f"Could not process data with {component.__class__.__name__}")
+                    warning(f"Could not process data with {component.__class__.__name__}: {e!r}")
                 else:
                     raise UnprocessableError(str(e))
 

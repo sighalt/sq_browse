@@ -1,6 +1,6 @@
 [project]
 name = "sq_browse"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Jakob Rößler", email="jakob@roessler.dev" },
 ]
