@@ -1,9 +1,29 @@
+import signal
 from contextlib import suppress
 from datetime import datetime
 from urllib.parse import urlparse, urlunsplit, urlsplit
 
 import requests
 from sq_browse.structs import BrowserResponse
+
+
+class ForcedTimeout(object):
+
+    def __init__(self, timeout):
+        self.timeout = timeout
+
+    @staticmethod
+    def raise_timeout(signum, stack):
+        raise TimeoutError("Forced timeout")
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.raise_timeout)
+        signal.alarm(self.timeout)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
 
 class Browser(object):
@@ -34,12 +54,16 @@ class RequestsBrowser(Browser):
                        "Chrome/132.0.0.0 Safari/537.36")
     }
 
+    def __init__(self, **config):
+        super().__init__(**config)
+        self.timeout = 3
+
     def browse(self, ambiguous_url: str) -> BrowserResponse:
         start = datetime.now()
 
         for url in self.possible_urls(ambiguous_url):
-            with suppress(IOError):
-                r = requests.get(url, timeout=2000, headers=self.HEADERS)
+            with suppress(IOError, TimeoutError), ForcedTimeout(self.timeout):
+                r = requests.get(url, timeout=self.timeout+0.001, headers=self.HEADERS)
                 break
         else:
             raise IOError(f"No valid URL found for {ambiguous_url}")
