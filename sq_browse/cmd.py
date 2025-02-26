@@ -49,7 +49,7 @@ def cmd_run_subprocess(args):
             os.dup2(devnull, sys.stdout.fileno())
             sys.exit(1)
         except Exception as e:
-            sys.stderr.write(str(e) + "\n")
+            sys.stderr.write(f"{e.__class__.__name__}: {str(e).strip()}\n")
             sys.stderr.flush()
             continue
 
